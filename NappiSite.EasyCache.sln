@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33103.184
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NappiSite.EasyCache", "NappiSite.EasyCache\NappiSite.EasyCache.csproj", "{C35CACC9-06E9-46A5-A962-CAE926584670}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C35CACC9-06E9-46A5-A962-CAE926584670}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C35CACC9-06E9-46A5-A962-CAE926584670}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C35CACC9-06E9-46A5-A962-CAE926584670}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C35CACC9-06E9-46A5-A962-CAE926584670}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3C2FCD8D-C2A2-49C1-B773-C6F77B65EC3D}
+	EndGlobalSection
+EndGlobal
