@@ -13,7 +13,7 @@ namespace NappiSite.EasyCache.Tests
             var preTestDictionaryCount = Cache.cacheLocks.Count;
 
             // act
-            cacheManager.GetOrAdd("key", () => "d", "tag");
+            cacheManager.GetOrAdd("key", () => "d");
 
             // assert 
             Assert.AreEqual(0, preTestDictionaryCount);

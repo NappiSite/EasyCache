@@ -50,7 +50,7 @@ namespace NappiSite.EasyCache
             }
         }
 
-        public void Insert(string cacheKey, object value, string tag = null)
+        public void Insert(string cacheKey, object value)
         {
             if (value == null) return;
 
@@ -87,7 +87,7 @@ namespace NappiSite.EasyCache
 
         public T GetOrAdd<T>(string cacheKey, Func<T> method)
         {
-            return GetOrAdd(cacheKey, method, null);
+            return GetOrAdd(cacheKey, method);
         }
 
         public async Task<T> GetOrAddAsync<T>(string cacheKey, Func<Task<T>> method)
@@ -100,27 +100,6 @@ namespace NappiSite.EasyCache
             }
 
             return obj is T ? (T)obj : default;
-        }
-
-        public T GetOrAdd<T>(string cacheKey, Func<T> method, string tag)
-        {
-            var obj = GetByKey(cacheKey);
-            if (obj == null)
-            {
-                lock (cacheLocks.GetOrAdd(cacheKey, new object()))
-                {
-                    obj = GetByKey(cacheKey);
-                    if (obj == null)
-                    {
-                        obj = method.Invoke();
-                        Insert(cacheKey, obj ?? new NullObject(), tag);
-                    }
-                }
-
-                cacheLocks.TryRemove(cacheKey, out System.Object o);
-            }
-
-            return obj is T ? (T)obj : default(T);
         }
 
         public T GetOrAdd<T>(Func<T> method, params object[] args)
