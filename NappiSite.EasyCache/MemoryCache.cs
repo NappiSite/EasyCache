@@ -20,8 +20,8 @@ namespace NappiSite.EasyCache
 
         public object this[string key]
         {
-            get => this.Get(key);
-            set => this.Insert(key, value);
+            get => Get(key);
+            set => Insert(key, value);
         }
 
         public object Get(string key) => _cache.Get(key);

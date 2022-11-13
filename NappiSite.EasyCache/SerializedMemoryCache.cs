@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Runtime.Caching;
-using System.Xml.Schema;
 
 namespace NappiSite.EasyCache
 {
@@ -10,11 +8,17 @@ namespace NappiSite.EasyCache
 
         public void Insert(string key, object value, DateTime absoluteExpiration)
         {
-            value = GetValue(value);
+            value = FormatValue(value);
             _cache.Insert(key, value,absoluteExpiration);
         }
 
-        private static object GetValue(object value)
+        public void Insert(string key, object value)
+        {
+            value = FormatValue(value);
+            _cache.Insert(key, value);
+        }
+
+        private static object FormatValue(object value)
         {
             switch (value)
             {
@@ -31,15 +35,11 @@ namespace NappiSite.EasyCache
         public object this[string key]
         {
             get => Get(key);
-            set => _cache.Insert(key, value);
+            set => Insert(key, value);
         }
 
-        public object Get(string key) => !(_cache.Get(key) is byte[] numArray) ? _cache.Get(key) : SerializationHelper.Deserialize(numArray);
+        public object Get(string key) => !(_cache.Get(key) is byte[] byteArray) ? _cache.Get(key) : SerializationHelper.Deserialize(byteArray);
 
-        public void Insert(string key, object value)
-        {
-            value = GetValue(value);
-            _cache.Insert(key, value);
-        }
+
     }
 }
