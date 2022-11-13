@@ -39,7 +39,5 @@ namespace NappiSite.EasyCache
         }
 
         public object Get(string key) => !(_cache.Get(key) is byte[] byteArray) ? _cache.Get(key) : SerializationHelper.Deserialize(byteArray);
-
-
     }
 }

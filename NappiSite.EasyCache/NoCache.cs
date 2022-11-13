@@ -9,11 +9,6 @@ namespace NappiSite.EasyCache
             //Do nothing
         }
 
-        public void Insert(string key, object value, DateTime absoluteExpiration, string tag)
-        {
-            //Do nothing
-        }
-
         public void Insert(string key, object value, DateTime absoluteExpiration)
         {
             //Do nothing
@@ -36,21 +31,6 @@ namespace NappiSite.EasyCache
         public object Get(string key)
         {
             return null;
-        }
-
-        public bool UsesSerialization
-        {
-            get { return false; }
-        }
-
-        public void Insert(string key, object value, string tag)
-        {
-            //Do nothing
-        }
-
-        public void RemoveByTag(string tag)
-        {
-            //Do nothing
         }
     }
 }
