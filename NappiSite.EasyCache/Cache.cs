@@ -87,7 +87,23 @@ namespace NappiSite.EasyCache
 
         public T GetOrAdd<T>(string cacheKey, Func<T> method)
         {
-            return GetOrAdd(cacheKey, method);
+            var obj = GetByKey(cacheKey);
+            if (obj == null)
+            {
+                lock (cacheLocks.GetOrAdd(cacheKey, new object()))
+                {
+                    obj = GetByKey(cacheKey);
+                    if (obj == null)
+                    {
+                        obj = method.Invoke();
+                        Insert(cacheKey, obj ?? new NullObject());
+                    }
+                }
+
+                cacheLocks.TryRemove(cacheKey, out System.Object o);
+            }
+
+            return obj is T ? (T)obj : default(T);
         }
 
         public async Task<T> GetOrAddAsync<T>(string cacheKey, Func<Task<T>> method)
@@ -100,13 +116,6 @@ namespace NappiSite.EasyCache
             }
 
             return obj is T ? (T)obj : default;
-        }
-
-        public T GetOrAdd<T>(Func<T> method, params object[] args)
-        {
-            var objectType = typeof(T);
-            var key = string.Format(GenerateCacheKeyFormat(objectType), args);
-            return GetOrAdd(key, method);
         }
 
         public static string GenerateCacheKeyFormat(Type type)

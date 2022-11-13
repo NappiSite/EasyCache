@@ -12,6 +12,5 @@ namespace NappiSite.EasyCache
         object Get(string cacheKey);
         T GetOrAdd<T>(string cacheKey, Func<T> method);
         Task<T> GetOrAddAsync<T>(string cacheKey, Func<Task<T>> method);
-        T GetOrAdd<T>(Func<T> method, params object[] args);
     }
 }
