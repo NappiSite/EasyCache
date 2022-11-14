@@ -21,7 +21,7 @@ namespace NappiSite.EasyCache
         internal static readonly ConcurrentDictionary<string, object> cacheLocks =
             new ConcurrentDictionary<string, object>();
 
-        public static Cache Default { get; } = new Cache(new CacheProviderFactory().GetCache());
+        public static Cache Default { get; } = new Cache(CacheProviderFactory.GetCache());
 
         public Cache(ICacheProvider cacheProvider)
         {

@@ -3,23 +3,17 @@ using System.Configuration;
 
 namespace NappiSite.EasyCache
 {
-    public sealed class CacheProviderFactory
+    internal static class CacheProviderFactory
     {
-        public ICacheProvider GetCache()
+        public static ICacheProvider GetCache()
         {
             var t = GetProviderType();
             return GetCache(t);
         }
 
-        private static ICacheProvider GetCache(Type type)
+        internal static ICacheProvider GetCache(Type type)
         {
             return GetProvider(type) ?? new EasyMemoryCache();
-        }
-
-        public ICacheProvider GetCache<T>()
-            where T : ICacheProvider
-        {
-            return GetCache(typeof(T));
         }
 
         private static ICacheProvider GetProvider(Type t)
@@ -29,9 +23,9 @@ namespace NappiSite.EasyCache
             return Activator.CreateInstance(t) as ICacheProvider;
         }
 
-        private static Type GetProviderType()
+        internal static Type GetProviderType()
         {
-            var cacheType = ConfigurationManager.AppSettings["cacheProviderType"];
+            var cacheType = ConfigurationManager.AppSettings["easyCache.cacheProviderType"];
             return string.IsNullOrEmpty(cacheType) ? null : Type.GetType(cacheType, true);
         }
     }
