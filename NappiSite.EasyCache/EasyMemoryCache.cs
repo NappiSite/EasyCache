@@ -11,7 +11,7 @@ namespace NappiSite.EasyCache
         {
             var item = new CacheItem(key, value);
             var policy = new CacheItemPolicy() { AbsoluteExpiration = absoluteExpiration };
-            _cache.Add(item, policy);
+            _cache.Set(item, policy);
         }
 
         public void Remove(string key) => _cache.Remove(key);

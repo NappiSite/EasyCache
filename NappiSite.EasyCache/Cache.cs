@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 [assembly: InternalsVisibleTo("NappiSite.EasyCache.Tests")]
 
@@ -9,36 +9,21 @@ namespace NappiSite.EasyCache
 {
     public class Cache : ICacheManager
     {
-        private const int DEFAULT_EXPIRATION_SECONDS = 3600;
         private readonly ICacheProvider _cache;
-        private static readonly object SyncLock = new object();
+        private static readonly ConcurrentDictionary<string, object> _cacheLocks = new ConcurrentDictionary<string, object>();
+        private static readonly ConcurrentDictionary<string, SemaphoreSlim> _asyncCacheLocks = new ConcurrentDictionary<string, SemaphoreSlim>();
 
-        private static class TypeCache<T>
+        public Cache() : this(CacheProviderFactory.GetCache())
         {
-            internal static string CacheKeyFormat { get; set; }
+
         }
 
-        internal static readonly ConcurrentDictionary<string, object> cacheLocks =
-            new ConcurrentDictionary<string, object>();
-
-        public static Cache Default { get; } = new Cache(CacheProviderFactory.GetCache());
-
-        public Cache(ICacheProvider cacheProvider)
+        internal Cache(ICacheProvider cacheProvider)
         {
             _cache = cacheProvider;
         }
 
-        internal ICacheProvider GetCache()
-        {
-            return _cache;
-        }
-
-        public static string GetCacheKey(string prefix, string uniqueValue)
-        {
-            return $"{prefix}_{uniqueValue}".ToLower();
-        }     
-
-        public void Update(string cacheKey, object value)
+        public void Update(string cacheKey, object value,DateTimeOffset absoluteExpiration)
         {
             var existingValue = _cache.Get(cacheKey);
             if (existingValue != value)
@@ -46,97 +31,83 @@ namespace NappiSite.EasyCache
                 if (value == null)
                     Remove(cacheKey);
                 else
-                    Insert(cacheKey, value);
+                    Insert(cacheKey, value, absoluteExpiration);
             }
         }
 
-        public void Insert(string cacheKey, object value)
+        public void Insert(string cacheKey, object value, DateTimeOffset absoluteExpiration)
         {
             if (value == null) return;
-
-            var absoluteExpiration = GetAbsoluteExpiration();
-      
-             _cache.Insert(cacheKey, value, absoluteExpiration);         
+            
+            _cache.Insert(cacheKey, value, absoluteExpiration);
         }
 
         public bool Exists(string cacheKey)
         {
-            return (GetByKey(cacheKey) != null);
+            return (_cache.Get(cacheKey) != null);
         }
 
         public void Remove(string cacheKey)
         {
             _cache.Remove(cacheKey);
         }
-
-        private static DateTime GetAbsoluteExpiration()
+        public object Get<T>(string cacheKey)
         {
-            return DateTime.Now.AddSeconds(DEFAULT_EXPIRATION_SECONDS);
+            var obj = (_cache.Get(cacheKey) is NullObject) ? null : _cache.Get(cacheKey);
+            return obj is T o ? o : default;
         }
-
-
-        public object Get(string cacheKey)
+        
+        public T GetOrAdd<T>(string cacheKey, Func<T> method,DateTimeOffset absoluteExpiration)
         {
-            return (_cache.Get(cacheKey) is NullObject) ? null : _cache.Get(cacheKey);
-        }
-
-        private object GetByKey(string cacheKey)
-        {
-            return _cache.Get(cacheKey);
-        }
-
-        public T GetOrAdd<T>(string cacheKey, Func<T> method)
-        {
-            var obj = GetByKey(cacheKey);
+            var obj = _cache.Get(cacheKey);
             if (obj == null)
             {
-                lock (cacheLocks.GetOrAdd(cacheKey, new object()))
+                try
                 {
-                    obj = GetByKey(cacheKey);
+                    lock (_cacheLocks.GetOrAdd(cacheKey, new object()))
+                    {
+                        obj = _cache.Get(cacheKey);
+                        if (obj == null)
+                        {
+                            obj = method.Invoke();
+                            Insert(cacheKey, obj ?? new NullObject(), absoluteExpiration);
+                        }
+                    }
+                }
+                finally
+                {
+                    _cacheLocks.TryRemove(cacheKey, out _);
+                }
+            }
+
+            return obj is T o ? o : default;
+        }
+
+        public async Task<T> GetOrAddAsync<T>(string cacheKey, Func<Task<T>> method,DateTimeOffset absoluteExpiration)
+        {
+            var obj = _cache.Get(cacheKey);
+            if (obj == null)
+            {
+                var lck = _asyncCacheLocks.GetOrAdd(cacheKey, new SemaphoreSlim(1, 1));
+                try
+                {
+                    await lck.WaitAsync();
+
+                    obj = _cache.Get(cacheKey);
                     if (obj == null)
                     {
-                        obj = method.Invoke();
-                        Insert(cacheKey, obj ?? new NullObject());
+                        obj = await method();
+                        Insert(cacheKey, obj ?? new NullObject(), absoluteExpiration);
                     }
                 }
-
-                cacheLocks.TryRemove(cacheKey, out System.Object o);
-            }
-
-            return obj is T ? (T)obj : default(T);
-        }
-
-        public async Task<T> GetOrAddAsync<T>(string cacheKey, Func<Task<T>> method)
-        {
-            var obj = GetByKey(cacheKey);
-            if (obj == null)
-            {
-                obj = await method();
-                Insert(cacheKey, obj ?? new NullObject());
-            }
-
-            return obj is T ? (T)obj : default;
-        }
-
-        public static string GenerateCacheKeyFormat(Type type)
-        {
-            return $"cm_{type.FullName.ToLower(CultureInfo.CurrentCulture)}_{{0}}";
-        }
-
-        public static string GenerateCacheKeyFormat<T>()
-        {
-            if (TypeCache<T>.CacheKeyFormat == null)
-            {
-                lock (SyncLock)
+                finally
                 {
-                    if (TypeCache<T>.CacheKeyFormat == null)
-                    {
-                        var type = typeof(T);
-                        TypeCache<T>.CacheKeyFormat = $"cm_{type.FullName.ToLower(CultureInfo.CurrentCulture)}_{{0}}";
-                    }
+                    lck?.Release();
+                    _asyncCacheLocks.TryRemove(cacheKey, out _);
                 }
             }
-            return TypeCache<T>.CacheKeyFormat;
+
+            return obj is T o ? o : default;
         }
 
         [Serializable]
