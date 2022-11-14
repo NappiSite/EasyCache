@@ -10,8 +10,8 @@ namespace NappiSite.EasyCache
     public class Cache : ICacheManager
     {
         private const int DEFAULT_EXPIRATION_SECONDS = 3600;
-        private readonly ICacheProvider cache;
-        private static readonly object syncLock = new object();
+        private readonly ICacheProvider _cache;
+        private static readonly object SyncLock = new object();
 
         private static class TypeCache<T>
         {
@@ -25,12 +25,12 @@ namespace NappiSite.EasyCache
 
         public Cache(ICacheProvider cacheProvider)
         {
-            cache = cacheProvider;
+            _cache = cacheProvider;
         }
 
         internal ICacheProvider GetCache()
         {
-            return cache;
+            return _cache;
         }
 
         public static string GetCacheKey(string prefix, string uniqueValue)
@@ -40,7 +40,7 @@ namespace NappiSite.EasyCache
 
         public void Update(string cacheKey, object value)
         {
-            var existingValue = cache.Get(cacheKey);
+            var existingValue = _cache.Get(cacheKey);
             if (existingValue != value)
             {
                 if (value == null)
@@ -56,7 +56,7 @@ namespace NappiSite.EasyCache
 
             var absoluteExpiration = GetAbsoluteExpiration();
       
-             cache.Insert(cacheKey, value, absoluteExpiration);         
+             _cache.Insert(cacheKey, value, absoluteExpiration);         
         }
 
         public bool Exists(string cacheKey)
@@ -66,7 +66,7 @@ namespace NappiSite.EasyCache
 
         public void Remove(string cacheKey)
         {
-            cache.Remove(cacheKey);
+            _cache.Remove(cacheKey);
         }
 
         private static DateTime GetAbsoluteExpiration()
@@ -77,12 +77,12 @@ namespace NappiSite.EasyCache
 
         public object Get(string cacheKey)
         {
-            return (cache.Get(cacheKey) is NullObject) ? null : cache.Get(cacheKey);
+            return (_cache.Get(cacheKey) is NullObject) ? null : _cache.Get(cacheKey);
         }
 
         private object GetByKey(string cacheKey)
         {
-            return cache.Get(cacheKey);
+            return _cache.Get(cacheKey);
         }
 
         public T GetOrAdd<T>(string cacheKey, Func<T> method)
@@ -127,7 +127,7 @@ namespace NappiSite.EasyCache
         {
             if (TypeCache<T>.CacheKeyFormat == null)
             {
-                lock (syncLock)
+                lock (SyncLock)
                 {
                     if (TypeCache<T>.CacheKeyFormat == null)
                     {

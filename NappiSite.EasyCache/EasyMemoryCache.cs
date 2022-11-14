@@ -3,11 +3,11 @@ using System.Runtime.Caching;
 
 namespace NappiSite.EasyCache
 {
-    internal sealed class EasyMemoryCache : ICacheProvider
+    internal class EasyMemoryCache : ICacheProvider
     {
         private static readonly MemoryCache _cache = MemoryCache.Default;
 
-        public void Insert(string key, object value, DateTimeOffset absoluteExpiration)
+        public virtual void Insert(string key, object value, DateTimeOffset absoluteExpiration)
         {
             var item = new CacheItem(key, value);
             var policy = new CacheItemPolicy() { AbsoluteExpiration = absoluteExpiration };
@@ -16,6 +16,6 @@ namespace NappiSite.EasyCache
 
         public void Remove(string key) => _cache.Remove(key);
 
-        public object Get(string key) => _cache.Get(key);
+        public virtual object Get(string key) => _cache.Get(key);
     }
 }
