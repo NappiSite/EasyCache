@@ -13,7 +13,7 @@ namespace NappiSite.EasyCache
 
         private static ICacheProvider GetCache(Type type)
         {
-            return GetProvider(type) ?? new MemoryCache();
+            return GetProvider(type) ?? new EasyMemoryCache();
         }
 
         public ICacheProvider GetCache<T>()

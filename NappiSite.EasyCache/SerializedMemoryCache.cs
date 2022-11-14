@@ -4,20 +4,13 @@ namespace NappiSite.EasyCache
 {
     public sealed class SerializedMemoryCache : ICacheProvider
     {
-        private static readonly MemoryCache _cache = new MemoryCache();
+        private static readonly EasyMemoryCache _cache = new EasyMemoryCache();
 
-        public void Insert(string key, object value, DateTime absoluteExpiration)
+        public void Insert(string key, object value, DateTimeOffset absoluteExpiration)
         {
             value = FormatValue(value);
             _cache.Insert(key, value,absoluteExpiration);
         }
-
-        public void Insert(string key, object value)
-        {
-            value = FormatValue(value);
-            _cache.Insert(key, value);
-        }
-
         private static object FormatValue(object value)
         {
             switch (value)
@@ -31,12 +24,6 @@ namespace NappiSite.EasyCache
         }
 
         public void Remove(string key) => _cache.Remove(key);
-
-        public object this[string key]
-        {
-            get => Get(key);
-            set => Insert(key, value);
-        }
 
         public object Get(string key) => !(_cache.Get(key) is byte[] byteArray) ? _cache.Get(key) : SerializationHelper.Deserialize(byteArray);
     }

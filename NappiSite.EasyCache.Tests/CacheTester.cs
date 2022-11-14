@@ -9,7 +9,7 @@ namespace NappiSite.EasyCache.Tests
         public void CacheLocksIsZeroAfterAddingItems()
         {
             // arrange 
-            var cacheManager = new Cache(new MemoryCache());
+            var cacheManager = new Cache(new EasyMemoryCache());
             var preTestDictionaryCount = Cache.cacheLocks.Count;
 
             // act

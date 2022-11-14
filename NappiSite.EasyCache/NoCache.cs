@@ -9,7 +9,7 @@ namespace NappiSite.EasyCache
             //Do nothing
         }
 
-        public void Insert(string key, object value, DateTime absoluteExpiration)
+        public void Insert(string key, object value, DateTimeOffset absoluteExpiration)
         {
             //Do nothing
         }

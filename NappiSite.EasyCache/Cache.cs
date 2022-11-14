@@ -77,12 +77,12 @@ namespace NappiSite.EasyCache
 
         public object Get(string cacheKey)
         {
-            return (cache[cacheKey] is NullObject) ? null : cache[cacheKey];
+            return (cache.Get(cacheKey) is NullObject) ? null : cache.Get(cacheKey);
         }
 
         private object GetByKey(string cacheKey)
         {
-            return cache[cacheKey];
+            return cache.Get(cacheKey);
         }
 
         public T GetOrAdd<T>(string cacheKey, Func<T> method)
