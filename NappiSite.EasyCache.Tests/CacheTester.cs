@@ -6,7 +6,6 @@ namespace NappiSite.EasyCache.Tests
     [TestClass]
     public class CacheTester
     {
-
         [TestMethod]
         public void GetOrAdd_NewValue_AddsNew()
         {
