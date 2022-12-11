@@ -1,46 +1,44 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace NappiSite.EasyCache.Tests
+namespace NappiSite.EasyCache.Tests;
+
+[TestClass]
+public class CacheProviderFactoryTester
 {
-    [TestClass]
-    public class CacheProviderFactoryTester
+    [TestMethod]
+    public void GetCache_DefaultToMemoryCache()
     {
-        [TestMethod]
-        public void GetCache_DefaultToMemoryCache()
-        {
-            // arrange 
-            
-            // act
-            var result = CacheProviderFactory.GetCache();
+        // arrange 
 
-            // assert 
-            Assert.IsInstanceOfType(result,typeof(EasyMemoryCache));
-        }
+        // act
+        var result = CacheProviderFactory.GetCache();
 
-        [TestMethod]
-        public void GetCache_GivenType_InstantiatesThatType()
-        {
-            // arrange 
+        // assert 
+        Assert.IsInstanceOfType(result, typeof(EasyMemoryCache));
+    }
 
-            // act
-            var result = CacheProviderFactory.GetCache(typeof(NoCache));
+    [TestMethod]
+    public void GetCache_GivenType_InstantiatesThatType()
+    {
+        // arrange 
 
-            // assert 
-            Assert.IsInstanceOfType(result, typeof(NoCache));
-        }
+        // act
+        var result = CacheProviderFactory.GetCache(typeof(NoCache));
 
-        [TestMethod]
-        public void GetProviderType_FromConfig_InstantiatesThatType()
-        {
-            // arrange 
-            //var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+        // assert 
+        Assert.IsInstanceOfType(result, typeof(NoCache));
+    }
 
-            // act
-            var result = CacheProviderFactory.GetProviderType();
+    [TestMethod]
+    public void GetProviderType_FromConfig_InstantiatesThatType()
+    {
+        // arrange 
+        //var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
 
-            // assert 
-            //Assert.IsInstanceOfType(result, typeof(EasyMemoryCache));
-        }
+        // act
+        var result = CacheProviderFactory.GetProviderType();
+
+        // assert 
+        //Assert.IsInstanceOfType(result, typeof(EasyMemoryCache));
     }
 }

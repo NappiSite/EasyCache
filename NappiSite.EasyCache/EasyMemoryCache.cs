@@ -10,12 +10,18 @@ namespace NappiSite.EasyCache
         public virtual void Insert(string key, object value, DateTimeOffset absoluteExpiration)
         {
             var item = new CacheItem(key, value);
-            var policy = new CacheItemPolicy() { AbsoluteExpiration = absoluteExpiration };
+            var policy = new CacheItemPolicy { AbsoluteExpiration = absoluteExpiration };
             _cache.Set(item, policy);
         }
 
-        public void Remove(string key) => _cache.Remove(key);
+        public void Remove(string key)
+        {
+            _cache.Remove(key);
+        }
 
-        public virtual object Get(string key) => _cache.Get(key);
+        public virtual object Get(string key)
+        {
+            return _cache.Get(key);
+        }
     }
 }

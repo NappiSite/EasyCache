@@ -13,7 +13,7 @@ namespace NappiSite.EasyCache
         {
             //Do nothing
         }
-        
+
         public object Get(string key)
         {
             return null;
