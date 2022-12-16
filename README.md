@@ -6,7 +6,6 @@ EasyCache is a thin wrapper over .NET cache API to simplify the syntax. With a s
 
 ### GetOrAddAsync
 ```csharp
-var result = await cacheManager.GetO```csharp
 var key="SomeCacheKey"
 var id = 1;
 
