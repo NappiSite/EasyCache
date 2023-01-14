@@ -8,9 +8,10 @@
     <RepositoryUrl>https://github.com/NappiSite/EasyCache</RepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryType>git</RepositoryType>
-    <Version>1.4.1</Version>
+    <Version>1.4.2</Version>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageIcon>nappisite.jpg</PackageIcon>
+    <PackageTags>cache;GetOrAddAsync;GetOrAdd;ICacheProvider</PackageTags>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\..\NappiCloud\nappisite.jpg">
